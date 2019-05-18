@@ -85,11 +85,17 @@ QImage ImageVault::roi(int poweroftwo, QRect roi) const {
   return dst;
 }
 
-QSize ImageVault::size() const {
+QSize ImageVault::size(int poweroftwo) const {
   if (imgs.isEmpty())
     return QSize();
+  if (poweroftwo<0) 
+    return QSize(imgs.first()->width()<<poweroftwo,
+		 imgs.first()->height()<<poweroftwo);
+  else if (poweroftwo<imgs.size())
+    return QSize(imgs[poweroftwo]->width(),
+		 imgs[poweroftwo]->height());
   else
-    return QSize(imgs.first()->width(), imgs.first()->height());
+    return QSize();
 }
 
 int ImageVault::maxPowerOfTwo() const {

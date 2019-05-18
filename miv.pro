@@ -12,5 +12,5 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 # Input
-HEADERS += ImageVault.h Image.h Viewer.h
-SOURCES += ImageVault.cpp Image.cpp miv.cpp Viewer.cpp
+HEADERS += ImageVault.h Image.h Viewer.h Navigator.h
+SOURCES += ImageVault.cpp Image.cpp miv.cpp Viewer.cpp Navigator.cpp

@@ -11,12 +11,15 @@ class Viewer: public QFrame {
 public:
   Viewer(QWidget *parent=0);
   virtual ~Viewer() {}
+  void setFilename(QString);
   void setSource(ImageVault const *vault);
   void keyPressEvent(QKeyEvent *) override;
   void mousePressEvent(QMouseEvent *) override;
   void mouseMoveEvent(QMouseEvent *) override;
   void resizeEvent(QResizeEvent *) override;
   void paintEvent(QPaintEvent *) override;
+  void setTitle();
+  void enableNavigator(bool x=true);
 private:
   ImageVault const *vault;
   int poweroftwo;
@@ -24,6 +27,8 @@ private:
   QPoint presspos;
   QPoint presstopleft;
   QPoint lastpos;
+  QString fn;
+  class Navigator *nav;
 };
 
 #endif

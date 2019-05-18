@@ -15,7 +15,7 @@ public:
   void setMaxMemory(int64_t);
   bool load(QString fn); // true if OK
   QImage roi(int poweroftwo, QRect roi) const;
-  QSize size() const;
+  QSize size(int poweroftwo=0) const;
   int maxPowerOfTwo() const;
 private:
   QList<class Image *> imgs;

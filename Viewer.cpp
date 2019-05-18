@@ -5,18 +5,23 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include "Navigator.h"
 
 Viewer::Viewer(QWidget *parent): QFrame(parent) {
   vault = 0;
   poweroftwo = 0;
+  nav = 0;
   // setAutoFillBackground(true);
+  setTitle();
 }
+
+static constexpr int MUSTRECALC = 10000;
 
 void Viewer::setSource(ImageVault const *v) {
   vault = v;
   QSize s = vault->size();
   if (width()==0 || height()==0) {
-    poweroftwo = -1;
+    poweroftwo = MUSTRECALC;
     return;
   }
   double xfac = s.width() / width();
@@ -27,12 +32,13 @@ void Viewer::setSource(ImageVault const *v) {
 }
 
 void Viewer::resizeEvent(QResizeEvent *) {
-  if (vault && poweroftwo < 0) {
+  if (vault && poweroftwo == MUSTRECALC) {
     QSize s = vault->size();
     double xfac = s.width() / width();
     double yfac = s.height() / height();
     double fac = xfac > yfac ? xfac : yfac;
     poweroftwo = std::ceil(log(fac) / log(2));
+    setTitle();
     topleft = QPoint(0,0);
   }
   update();
@@ -46,15 +52,17 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
     if (poweroftwo<vault->maxPowerOfTwo()) {
       QPoint oldcenter = topleft + QPoint(width()/2, height()/2);
       poweroftwo++;
+      setTitle();
       QPoint newcenter(oldcenter.x() / 2, oldcenter.y() / 2);
       topleft = newcenter - QPoint(width()/2, height()/2);
       update();
     }
     break;
   case Qt::Key_Plus: case Qt::Key_Equal:
-    if (poweroftwo>0) {
+    if (poweroftwo>-2) {
       QPoint oldcenter = topleft + QPoint(width()/2, height()/2);
       poweroftwo--;
+      setTitle();
       QPoint newcenter(oldcenter.x() * 2, oldcenter.y() * 2);
       topleft = newcenter - QPoint(width()/2, height()/2);
       update();
@@ -71,15 +79,74 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
 }
 
 void Viewer::mouseMoveEvent(QMouseEvent *e) {
+  const int MARGIN = width()/50;
+  if (!vault)
+    return;
   lastpos = e->pos();
   topleft = presstopleft - lastpos + presspos;
+  QSize s = vault->size(poweroftwo);
+  int r = topleft.x() + width();
+  int b = topleft.y() + height();
+  if (r > s.width() + MARGIN)
+    topleft.setX(s.width() + MARGIN - width());
+  if (b > s.height() + MARGIN)
+    topleft.setY(s.height() + MARGIN - width());
+  if (topleft.x() < -MARGIN)
+    topleft.setX(-MARGIN);
+  if (topleft.y() < -MARGIN)
+    topleft.setY(-MARGIN);
   update();
 }
 
 void Viewer::paintEvent(QPaintEvent *e) {
   QWidget::paintEvent(e);
+  if (!vault)
+    return;
   QPainter p(this);
-  if (vault)
+  if (poweroftwo<0) {
+    int x0 = topleft.x() >> (-poweroftwo);
+    int y0 = topleft.y() >> (-poweroftwo);
+    int w = width() >> (-poweroftwo);
+    int h = height() >> (-poweroftwo);
+    QImage img = vault->roi(0, QRect(QPoint(x0,y0), QSize(w,h)));
+    p.scale(1<<(-poweroftwo), 1<<(-poweroftwo));
+    p.drawImage(QPoint(), img);
+  } else {
     p.drawImage(QPoint(),
 		vault->roi(poweroftwo, QRect(topleft, size())));
+  }
+}
+
+void Viewer::setFilename(QString f) {
+  fn = f;
+  setTitle();
+}
+
+void Viewer::setTitle() {
+  QString ttl;
+  if (fn.isEmpty())
+    ttl = "miv";
+  else if (poweroftwo==MUSTRECALC)
+    ttl = fn;
+  else if (poweroftwo<0)
+    ttl = QString("%1 - %2:1").arg(fn).arg(1<<(-poweroftwo));
+  else
+    ttl = QString("%1 - 1:%2").arg(fn).arg(1<<(poweroftwo));
+  setWindowTitle(ttl);
+}
+
+void Viewer::enableNavigator(bool x) {
+  if (x) {
+    if (!nav) {
+      nav = new Navigator(this);
+      nav->setSource(vault);
+    } 
+    nav->move(5,5);
+    nav->setMainPower(poweroftwo);
+    nav->setMainRect(QRect(topleft, size()));
+    nav->autopower(size());
+    nav->show();
+  } else {
+    nav->hide();
+  }
 }
