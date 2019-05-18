@@ -6,11 +6,13 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include "Navigator.h"
+#include <QDebug>
 
 Viewer::Viewer(QWidget *parent): QFrame(parent) {
   vault = 0;
   poweroftwo = 0;
   nav = 0;
+  naven = false;
   // setAutoFillBackground(true);
   setTitle();
 }
@@ -29,6 +31,11 @@ void Viewer::setSource(ImageVault const *v) {
   double fac = xfac > yfac ? xfac : yfac;
   poweroftwo = std::ceil(log(fac) / log(2));
   topleft = QPoint(0,0);
+  if (naven) {
+    nav->setSource(vault);
+    nav->setMainPower(poweroftwo);
+    nav->setMainRect(QRect(topleft, size()));
+  }
 }
 
 void Viewer::resizeEvent(QResizeEvent *) {
@@ -40,6 +47,11 @@ void Viewer::resizeEvent(QResizeEvent *) {
     poweroftwo = std::ceil(log(fac) / log(2));
     setTitle();
     topleft = QPoint(0,0);
+  }
+  if (naven) {
+    qDebug() << "resize";
+    nav->setMainRect(QRect(topleft, size()));
+    nav->autoPower(size());
   }
   update();
 }
@@ -53,9 +65,11 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
       QPoint oldcenter = topleft + QPoint(width()/2, height()/2);
       poweroftwo++;
       setTitle();
+      if (naven)
+	nav->setMainPower(poweroftwo);
       QPoint newcenter(oldcenter.x() / 2, oldcenter.y() / 2);
       topleft = newcenter - QPoint(width()/2, height()/2);
-      update();
+      newPosition();
     }
     break;
   case Qt::Key_Plus: case Qt::Key_Equal:
@@ -63,10 +77,15 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
       QPoint oldcenter = topleft + QPoint(width()/2, height()/2);
       poweroftwo--;
       setTitle();
+      if (naven)
+	nav->setMainPower(poweroftwo);
       QPoint newcenter(oldcenter.x() * 2, oldcenter.y() * 2);
       topleft = newcenter - QPoint(width()/2, height()/2);
-      update();
+      newPosition();
     }
+    break;
+  case Qt::Key_N:
+    enableNavigator(!naven);
     break;
   default:
     break;
@@ -79,22 +98,28 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
 }
 
 void Viewer::mouseMoveEvent(QMouseEvent *e) {
-  const int MARGIN = width()/50;
   if (!vault)
     return;
   lastpos = e->pos();
-  topleft = presstopleft - lastpos + presspos;
+  topleft = presstopleft - 3*(lastpos - presspos);
+  newPosition();
+}
+
+void Viewer::newPosition() {
+  const int MARGIN = width()/50;
   QSize s = vault->size(poweroftwo);
   int r = topleft.x() + width();
   int b = topleft.y() + height();
   if (r > s.width() + MARGIN)
     topleft.setX(s.width() + MARGIN - width());
   if (b > s.height() + MARGIN)
-    topleft.setY(s.height() + MARGIN - width());
+    topleft.setY(s.height() + MARGIN - height());
   if (topleft.x() < -MARGIN)
     topleft.setX(-MARGIN);
   if (topleft.y() < -MARGIN)
     topleft.setY(-MARGIN);
+  if (naven)
+    nav->setMainRect(QRect(topleft, size()));
   update();
 }
 
@@ -136,6 +161,7 @@ void Viewer::setTitle() {
 }
 
 void Viewer::enableNavigator(bool x) {
+  naven = x;
   if (x) {
     if (!nav) {
       nav = new Navigator(this);
@@ -144,7 +170,7 @@ void Viewer::enableNavigator(bool x) {
     nav->move(5,5);
     nav->setMainPower(poweroftwo);
     nav->setMainRect(QRect(topleft, size()));
-    nav->autopower(size());
+    nav->autoPower(size());
     nav->show();
   } else {
     nav->hide();

@@ -20,6 +20,7 @@ public:
   void paintEvent(QPaintEvent *) override;
   void setTitle();
   void enableNavigator(bool x=true);
+  void newPosition();
 private:
   ImageVault const *vault;
   int poweroftwo;
@@ -29,6 +30,7 @@ private:
   QPoint lastpos;
   QString fn;
   class Navigator *nav;
+  bool naven;
 };
 
 #endif

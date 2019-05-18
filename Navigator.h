@@ -11,18 +11,19 @@ class Navigator: public QFrame {
 public:
   Navigator(QWidget *parent=0);
   virtual ~Navigator();
-  void setSource(ImageVault *iv);
-  void setMainScale(int poweroftwo);
-  void setOurScale(int poweroftwo);
+  void setSource(ImageVault const *iv);
+  void setMainPower(int poweroftwo);
+  void setOurPower(int poweroftwo);
   void setMainRect(QRect);
   void paintEvent(QPaintEvent *) override;
 public slots:
-  void autosize();
+  void autoSize();
+  void autoPower(QSize s); // S is size of parent window
 private:
   int mainpwr;
   int ourpwr;
   QRect mainrect;
-  ImageVault *vault;
+  ImageVault const *vault;
 };
 
 #endif

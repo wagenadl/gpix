@@ -14,17 +14,17 @@ Navigator::Navigator(QWidget *parent): QFrame(parent) {
 Navigator::~Navigator() {
 }
 
-void Navigator::setSource(ImageVault *iv) {
+void Navigator::setSource(ImageVault const *iv) {
   vault = iv;
   update();
 }
 
-void Navigator::setMainScale(int poweroftwo) {
+void Navigator::setMainPower(int poweroftwo) {
   mainpwr = poweroftwo;
   update();
 }
 
-void Navigator::setOurScale(int poweroftwo) {
+void Navigator::setOurPower(int poweroftwo) {
   ourpwr = poweroftwo;
   update();
 }
@@ -34,18 +34,18 @@ void Navigator::setMainRect(QRect r) {
   update();
 }
 
-void Navigator::autopower(QSize mainsize) {
+void Navigator::autoPower(QSize mainsize) {
   if (!vault)
     return;
-  int h = mainsize.height() / 7; // reasonable max?
+  int h = mainsize.height() / 5; // reasonable max?
   int m = 0;
   while (vault->size(m).height() > h)
     m++;
   ourpwr = m;
-  autosize();
+  autoSize();
 }
  
-void Navigator::autosize() {
+void Navigator::autoSize() {
   if (!vault)
     return;
   if (mainrect.isEmpty())
@@ -60,9 +60,9 @@ void Navigator::paintEvent(QPaintEvent *e) {
   QWidget::paintEvent(e);
   if (!vault)
     return;
-  QPainter p;
+  QPainter p(this);
   p.drawImage(QPoint(0,0), vault->roi(ourpwr, QRect(QPoint(0,0), size())));
-  p.setPen(QPen(QColor(255, 192, 0)));
+  p.setPen(QPen(QColor(255, 160, 0), 2));
   int l = mainrect.left() >> (ourpwr - mainpwr);
   int t = mainrect.top() >> (ourpwr - mainpwr);
   int r = mainrect.right() >> (ourpwr - mainpwr);
