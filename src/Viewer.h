@@ -16,11 +16,14 @@ public:
   void keyPressEvent(QKeyEvent *) override;
   void mousePressEvent(QMouseEvent *) override;
   void mouseMoveEvent(QMouseEvent *) override;
+  void wheelEvent(QWheelEvent *) override;
   void resizeEvent(QResizeEvent *) override;
   void paintEvent(QPaintEvent *) override;
   void setTitle();
   void enableNavigator(bool x=true);
   void newPosition();
+  void zoomIn();
+  void zoomOut();
 private:
   ImageVault const *vault;
   int poweroftwo;
@@ -31,6 +34,7 @@ private:
   QString fn;
   class Navigator *nav;
   bool naven;
+  int pixaccum;
 };
 
 #endif

@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include "Navigator.h"
 #include <QDebug>
 
@@ -15,6 +16,7 @@ Viewer::Viewer(QWidget *parent): QFrame(parent) {
   naven = false;
   // setAutoFillBackground(true);
   setTitle();
+  pixaccum = 0;
 }
 
 static constexpr int MUSTRECALC = 10000;
@@ -60,29 +62,11 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
   if (!vault)
     return;
   switch (e->key()) {
-  case Qt::Key_Minus: 
-    if (poweroftwo<vault->maxPowerOfTwo()) {
-      QPoint oldcenter = topleft + QPoint(width()/2, height()/2);
-      poweroftwo++;
-      setTitle();
-      if (naven)
-	nav->setMainPower(poweroftwo);
-      QPoint newcenter(oldcenter.x() / 2, oldcenter.y() / 2);
-      topleft = newcenter - QPoint(width()/2, height()/2);
-      newPosition();
-    }
+  case Qt::Key_Minus:
+    zoomOut();
     break;
   case Qt::Key_Plus: case Qt::Key_Equal:
-    if (poweroftwo>-2) {
-      QPoint oldcenter = topleft + QPoint(width()/2, height()/2);
-      poweroftwo--;
-      setTitle();
-      if (naven)
-	nav->setMainPower(poweroftwo);
-      QPoint newcenter(oldcenter.x() * 2, oldcenter.y() * 2);
-      topleft = newcenter - QPoint(width()/2, height()/2);
-      newPosition();
-    }
+    zoomIn();
     break;
   case Qt::Key_Slash:
     enableNavigator(!naven);
@@ -91,6 +75,34 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
     break;
   }
 }
+
+void Viewer::zoomOut() {
+  if (poweroftwo<vault->maxPowerOfTwo()
+      && (width() < vault->size(poweroftwo).width()
+          || height() < vault->size(poweroftwo).height())) {
+    QPoint oldcenter = topleft + QPoint(width()/2, height()/2);
+    poweroftwo++;
+    setTitle();
+    if (naven)
+      nav->setMainPower(poweroftwo);
+    QPoint newcenter(oldcenter.x() / 2, oldcenter.y() / 2);
+    topleft = newcenter - QPoint(width()/2, height()/2);
+    newPosition();
+  }
+}  
+
+void Viewer::zoomIn() {
+  if (poweroftwo>-2) {
+    QPoint oldcenter = topleft + QPoint(width()/2, height()/2);
+    poweroftwo--;
+    setTitle();
+    if (naven)
+      nav->setMainPower(poweroftwo);
+    QPoint newcenter(oldcenter.x() * 2, oldcenter.y() * 2);
+    topleft = newcenter - QPoint(width()/2, height()/2);
+    newPosition();
+  }
+}  
 
 void Viewer::mousePressEvent(QMouseEvent *e) {
   presspos = e->pos();
@@ -103,6 +115,25 @@ void Viewer::mouseMoveEvent(QMouseEvent *e) {
   lastpos = e->pos();
   topleft = presstopleft - 3*(lastpos - presspos);
   newPosition();
+}
+
+void Viewer::wheelEvent(QWheelEvent *e) {
+  if (!vault)
+    return;
+  if (e->modifiers() & Qt::ControlModifier) {
+    constexpr int STEPS = 32;
+    pixaccum += e->pixelDelta().y();
+    if (pixaccum>STEPS) {
+      pixaccum -= STEPS;
+      zoomIn();
+    } else if (pixaccum<-STEPS) {
+      pixaccum += STEPS;
+      zoomOut();
+    }
+  } else {
+    topleft -= 10 * e->pixelDelta();
+    newPosition();
+  }
 }
 
 void Viewer::newPosition() {
