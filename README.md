@@ -14,19 +14,38 @@ In Debian-style Linuxes, these may be installed by typing:
 
     sudo apt install libopencv-dev qtbase5-dev
 
-To build from source in Linux, simply type “make” followed by “sudo
-make install”. To build from source in Windows or Mac, please load
+To build from source in Linux, simply type
+
+    make
+    
+followed by
+
+    sudo make install
+    
+To build from source in Windows or Mac, please load
 “src/gpix.pro” in Qt Creator and compile from there.
 
 ## Usage
 
-To run on an 8-bit grayscale image, type “gpix <imagefile>” or just
-“gpix” to open a dialog to select the image.
+To run on an 8-bit grayscale image, type
+
+    gpix <imagefile>
+
+or just
+
+    gpix
+
+to open a dialog to select the image.
 
 GPix can also handle 16-bit grayscale images. In that case, “contrast
 stretching” is usually recommended. To clip 0.5% of pixels on the
 black side of the histogram and 0.2% of pixels on the white side, type
-“gpix -b 0.5 -w 0.2 <imagefile>”.
+
+    gpix -b 0.5 -w 0.2 <imagefile>
+
+For complete information on command-line use, type
+
+    gpix --help
 
 GPix currently converts color images to grayscale.
 
