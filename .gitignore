@@ -1,5 +1,2 @@
-Makefile
-miv
-.qmake.stash
-*.o
+build
 

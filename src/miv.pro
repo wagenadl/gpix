@@ -5,7 +5,7 @@
 TEMPLATE = app
 QT += widgets
 TARGET = miv
-INCLUDEPATH += .
+INCLUDEPATH += ../src
 LIBS += -lopencv_imgproc -lopencv_imgcodecs -lopencv_core
 
 DEFINES += QT_DEPRECATED_WARNINGS
