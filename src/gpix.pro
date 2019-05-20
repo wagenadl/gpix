@@ -4,7 +4,7 @@
 
 TEMPLATE = app
 QT += widgets
-TARGET = miv
+TARGET = gpix
 INCLUDEPATH += ../src
 LIBS += -lopencv_imgproc -lopencv_imgcodecs -lopencv_core
 
@@ -13,4 +13,4 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 # Input
 HEADERS += ImageVault.h Image.h Viewer.h Navigator.h
-SOURCES += ImageVault.cpp Image.cpp miv.cpp Viewer.cpp Navigator.cpp
+SOURCES += ImageVault.cpp Image.cpp gpix.cpp Viewer.cpp Navigator.cpp

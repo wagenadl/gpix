@@ -36,7 +36,7 @@ src: prep
 
 prep:
 	mkdir -p build
-	( cd build; $(SELECTQT) $(QMAKE) ../src/miv.pro )
+	( cd build; $(SELECTQT) $(QMAKE) ../src/gpix.pro )
 
 # Unix installation
 install: all
@@ -45,7 +45,7 @@ install: all
 
 # Tar preparation
 tar: all
-	git archive -o ../miv.tar.gz --prefix=miv/ HEAD
+	git archive -o ../gpix.tar.gz --prefix=gpix/ HEAD
 
 .PHONY: src all clean tar install prep
 

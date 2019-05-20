@@ -1,4 +1,4 @@
-// miv.cpp
+// gpix.cpp
 
 #include "ImageVault.h"
 #include <QApplication>
@@ -9,7 +9,7 @@
 
 int main(int argc, char **argv) {
   QApplication app(argc, argv);
-  app.setApplicationName("miv");
+  app.setApplicationName("gpix");
   QCommandLineParser p;
   p.addHelpOption();
   p.addPositionalArgument("file", "image file name");
