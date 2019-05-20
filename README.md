@@ -27,7 +27,10 @@ Miv currently converts color images to grayscale.
 
 Miv works by loading the image file, than precalculating reduced-size
 versions of the image by successively averaging over 2x2-pixel
-areas. When miv starts, it zooms out to show the entire image in its
+areas. This allows it to zoom and pan around large images much more
+quickly than other programs.
+
+When miv starts, it zooms out to show the entire image in its
 window. Press “+” to zoom in and “-” to zoom out. Press “/” to enable
 a navigator inset that indicates what part of the full image is being
 shown.
