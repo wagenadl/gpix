@@ -9,6 +9,11 @@ images up to a few gigapixels on contemporary hardware.
 
 ## Installation
 
+GPix requires opencv version 3.0 or later and Qt version 5.5 or later.
+In Debian-style Linuxes, these may be installed by typing:
+
+    sudo apt install libopencv-dev qtbase5-dev
+
 To build from source in Linux, simply type “make” followed by “sudo
 make install”. To build from source in Windows or Mac, please load
 “src/gpix.pro” in Qt Creator and compile from there.
