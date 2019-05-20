@@ -8,6 +8,7 @@
 #include <QWheelEvent>
 #include "Navigator.h"
 #include <QDebug>
+#include <QFileInfo>
 
 Viewer::Viewer(QWidget *parent): QFrame(parent) {
   vault = 0;
@@ -174,7 +175,8 @@ void Viewer::paintEvent(QPaintEvent *e) {
 }
 
 void Viewer::setFilename(QString f) {
-  fn = f;
+  QFileInfo fi(f);
+  fn = fi.fileName();
   setTitle();
 }
 
