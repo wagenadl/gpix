@@ -19,7 +19,7 @@ Image::Image(int X, int Y): X(X), Y(Y) {
   qDebug() << "constructed image" << X << Y;
 }
 
-Image::Image(QString fn) {
+Image::Image(QString fn, double clpblk, double clpwht) {
   d = QSharedPointer<ImageData>(new ImageData());
   cv::Mat img = cv::imread(fn.toUtf8().data(),
 			   cv::IMREAD_GRAYSCALE
@@ -43,8 +43,8 @@ Image::Image(QString fn) {
 	h[line[x]]++;
     }
     uint64_t N = X*Y;
-    uint64_t lowthr = int(.04 * N);
-    uint64_t highthr = int(.04 * N);
+    uint64_t lowthr = int(.01*clpblk * N);
+    uint64_t highthr = int(.01*clpwht * N);
     uint16_t mn = 0;
     uint64_t lowacc = 0;
     while (lowacc < lowthr) 

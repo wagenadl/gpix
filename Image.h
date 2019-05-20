@@ -9,7 +9,7 @@
 class Image {
 public:
   Image(int X, int Y);
-  Image(QString filename);
+  Image(QString filename, double clpblkprc=0, double clpwhtprc=-1);
   Image(Image const *); // decimates
   bool isValid() const { return X>0 && Y>0; }
   uint8_t const *line(int y) const;

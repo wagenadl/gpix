@@ -7,11 +7,17 @@
 
 ImageVault::ImageVault() {
   maxmem = 0;
+  clpblk = clpwht = 0;
 }
 
 ImageVault::~ImageVault() {
   for (Image *img: imgs)
     delete img;
+}
+
+void ImageVault::setClipping(double blk, double wht) {
+  clpblk = blk;
+  clpwht = wht < 0 ? blk : wht;
 }
 
 void ImageVault::setMaxMemory(int64_t mm) {
@@ -26,7 +32,7 @@ bool ImageVault::load(QString fn) {
     return false;
   imgs.clear();
   qDebug() << "Loading" << fn << "(" << fi.size() << "bytes)";
-  imgs << new Image(fn);
+  imgs << new Image(fn, clpblk, clpwht);
   int W = imgs[0]->width();
   int H = imgs[0]->height();
   while (W>2 && H>2) {
@@ -89,8 +95,8 @@ QSize ImageVault::size(int poweroftwo) const {
   if (imgs.isEmpty())
     return QSize();
   if (poweroftwo<0) 
-    return QSize(imgs.first()->width()<<poweroftwo,
-		 imgs.first()->height()<<poweroftwo);
+    return QSize(imgs.first()->width()<<(-poweroftwo),
+		 imgs.first()->height()<<(-poweroftwo));
   else if (poweroftwo<imgs.size())
     return QSize(imgs[poweroftwo]->width(),
 		 imgs[poweroftwo]->height());

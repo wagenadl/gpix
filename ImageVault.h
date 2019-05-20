@@ -13,13 +13,16 @@ public:
   ImageVault();
   ~ImageVault();
   void setMaxMemory(int64_t);
-  bool load(QString fn); // true if OK
+  void setClipping(double clipBlackPct, double clipWhitePct=-1);
+  bool load(QString fn);
+  // true if OK
   QImage roi(int poweroftwo, QRect roi) const;
   QSize size(int poweroftwo=0) const;
   int maxPowerOfTwo() const;
 private:
   QList<class Image *> imgs;
   int64_t maxmem;
+  double clpblk, clpwht;
 };
 
 #endif

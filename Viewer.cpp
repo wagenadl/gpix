@@ -84,7 +84,7 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
       newPosition();
     }
     break;
-  case Qt::Key_N:
+  case Qt::Key_Slash:
     enableNavigator(!naven);
     break;
   default:
