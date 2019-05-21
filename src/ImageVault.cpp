@@ -132,14 +132,12 @@ QImage ImageVault::colorroi(Image const *src, QRect roi) const {
     return dst;
   
   for (int y=0; y<Y; y++) {
-    uint8_t const *rp = src->line(y+y0) + x0;
+    uint8_t const *srcp = src->line(y+y0) + 3*x0;
     uint32_t *dstp = reinterpret_cast<uint32_t*>(dst.scanLine(y + yout)) + xout;
-    uint8_t const *gp = rp + X;
-    uint8_t const *bp = gp + X;
     for (int x=0; x<X; x++) {
-      uint32_t r = *rp++;
-      uint32_t g = *gp++;
-      uint32_t b = *bp++;
+      uint32_t r = *srcp++;
+      uint32_t g = *srcp++;
+      uint32_t b = *srcp++;
       uint32_t rgb = 0xff000000 + r + (g<<8) + (b<<16);
       *dstp++ = rgb;
     }

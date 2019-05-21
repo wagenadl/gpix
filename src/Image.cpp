@@ -87,19 +87,46 @@ uint8_t const *Image::line(int y) const {
 }
 
 Image::Image(Image const *src) {
-  X = src->width() / 2;
-  Y = src->height() / 2;
-  d = QSharedPointer<ImageData>(new ImageData(X, Y));
-  for (int y=0; y<Y; y++) {
-    uint8_t const *srcp1 = src->line(2*y);
-    uint8_t const *srcp2 = src->line(2*y+1);
-    uint8_t *dstp = &d->image.at<uint8_t>(y,0);
-    for (int x=0; x<X; x++) {
-      uint32_t v = *srcp1++;
-      v += *srcp1++;
-      v += *srcp2++;
-      v += *srcp2++;
-      *dstp++ = (v+2)/4;
+  // creates a 1/2 sized image
+  X = src->X / 2;
+  Y = src->Y / 2;
+  C = src->C;
+  d = QSharedPointer<ImageData>(new ImageData(X, Y, C == 3));
+  if (C==1) {
+    for (int y=0; y<Y; y++) {
+      uint8_t const *srcp1 = src->line(2*y);
+      uint8_t const *srcp2 = src->line(2*y+1);
+      uint8_t *dstp = &d->image.at<uint8_t>(y,0);
+      for (int x=0; x<X; x++) {
+        uint32_t v = *srcp1++;
+        v += *srcp1++;
+        v += *srcp2++;
+        v += *srcp2++;
+        *dstp++ = (v+2)/4;
+      }
+    }
+  } else if (C==3) {
+    for (int y=0; y<Y; y++) {
+      uint8_t const *srcp1 = src->line(2*y);
+      uint8_t const *srcp2 = src->line(2*y+1);
+      uint8_t *dstp = &d->image.at<uint8_t>(y,0);
+      for (int x=0; x<X; x++) {
+        uint32_t r = *srcp1++;
+        uint32_t g = *srcp1++;
+        uint32_t b = *srcp1++;
+        r+= *srcp1++;
+        g+= *srcp1++;
+        b+= *srcp1++;
+        r+= *srcp2++;
+        g+= *srcp2++;
+        b+= *srcp2++;
+        r+= *srcp2++;
+        g+= *srcp2++;
+        b+= *srcp2++;
+        *dstp++ = (r+2)/4;
+        *dstp++ = (g+2)/4;
+        *dstp++ = (b+2)/4;
+      }
     }
   }
 }
