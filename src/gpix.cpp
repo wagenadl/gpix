@@ -14,10 +14,12 @@ int main(int argc, char **argv) {
   p.addHelpOption();
   p.addPositionalArgument("file", "image file name");
   p.addOption(QCommandLineOption("b",
-                                 "Percentage of black to clip in 16-bit images",
+                                 "Percentage of black to clip in 16-bit images"
+                                 " (default: 1)",
                                  "black%"));
   p.addOption(QCommandLineOption("w",
-                                 "Percentage of white to clip in 16-bit images",
+                                 "Percentage of white to clip in 16-bit images"
+                                 " (default: same as black)",
                                  "white%"));
   p.process(app);
   QStringList args(p.positionalArguments());
@@ -45,9 +47,9 @@ int main(int argc, char **argv) {
   else if (blkprc<0)
     blkprc = whtprc;
   if (whtprc<0)
-    whtprc = 0;
+    whtprc = 1;
   if (blkprc<0)
-    blkprc = 0;
+    blkprc = 1;
   
   ImageVault iv;
   iv.setClipping(blkprc, whtprc);
