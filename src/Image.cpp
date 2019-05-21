@@ -9,20 +9,21 @@
 class ImageData {
 public:
   ImageData() { }
-  ImageData(int X, int Y): image(Y, X, CV_8UC1) { }
+  ImageData(int X, int Y, bool color=false):
+    image(Y, X, color ? CV_8UC3 : CV_8UC1) { }
 public:
   cv::Mat image;
 };
 
-Image::Image(int X, int Y): X(X), Y(Y) {
-  d = QSharedPointer<ImageData>(new ImageData(X, Y));
+Image::Image(int X, int Y, bool color): X(X), Y(Y), C(color ? 3 : 1) {
+  d = QSharedPointer<ImageData>(new ImageData(X, Y, color));
   qDebug() << "constructed image" << X << Y;
 }
 
 Image::Image(QString fn, double clpblk, double clpwht) {
   d = QSharedPointer<ImageData>(new ImageData());
   cv::Mat img = cv::imread(fn.toUtf8().data(),
-			   cv::IMREAD_GRAYSCALE
+			   cv::IMREAD_ANYCOLOR
 			   | cv::IMREAD_ANYDEPTH); // Read the file
   if (img.empty()) {
     X = Y = 0;
@@ -67,17 +68,18 @@ Image::Image(QString fn, double clpblk, double clpwht) {
 	line[x] = v<0 ? 0 : v>255 ? 255 : v;
       }
     }
-    qDebug() << "range" << mn << mx;
   }
 
   if (img.type() == CV_8UC1) {
     d->image = img;
+    C = 1;
+  } else if (img.type() == CV_8UC3) {
+    d->image = img;
+    C = 3;
   } else {
     img.assignTo(d->image, CV_8UC1);
+    C = 1;
   }
-
-  qDebug() << "loaded image" << X << Y << "of type" << img.type();
-  qDebug() << "cf. 8UC1" << CV_8UC1 << "or 16" << CV_16UC1;
 }
 
 uint8_t const *Image::line(int y) const {

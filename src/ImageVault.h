@@ -20,6 +20,9 @@ public:
   QSize size(int poweroftwo=0) const;
   int maxPowerOfTwo() const;
 private:
+  QImage grayroi(class Image const *src, QRect roi) const;
+  QImage colorroi(class Image const *src, QRect roi) const;
+private:
   QList<class Image *> imgs;
   int64_t maxmem;
   double clpblk, clpwht;

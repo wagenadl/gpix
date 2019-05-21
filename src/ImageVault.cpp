@@ -49,6 +49,13 @@ QImage ImageVault::roi(int poweroftwo, QRect roi) const {
   if (poweroftwo>=imgs.size())
     return QImage();
   Image const *src = imgs[poweroftwo];
+  if (src->channels()>1)
+    return colorroi(src, roi);
+  else
+    return grayroi(src, roi);
+}
+
+QImage ImageVault::grayroi(Image const *src, QRect roi) const {
   QImage dst(roi.size(), QImage::Format_Grayscale8);
   int Y = roi.height();
   int X = roi.width();
@@ -82,11 +89,60 @@ QImage ImageVault::roi(int poweroftwo, QRect roi) const {
   if (X<=0 || Y<=0)
     return dst;
   
-  qDebug() << poweroftwo << roi << xout << x0 << X << "x" << yout << y0 << Y;
   for (int y=0; y<Y; y++) {
     uint8_t const *srcp = src->line(y+y0) + x0;
     uint8_t *dstp = dst.scanLine(y + yout) + xout;
     memcpy(dstp, srcp, X);
+  }
+  return dst;
+}
+
+QImage ImageVault::colorroi(Image const *src, QRect roi) const {
+  QImage dst(roi.size(), QImage::Format_RGB32);
+  int Y = roi.height();
+  int X = roi.width();
+  int x0 = roi.left();
+  int y0 = roi.top();
+  int xout = 0;
+  int yout = 0;
+  bool mustfill = false;
+  if (x0<0) {
+    X += x0;
+    xout = -x0;
+    x0 = 0;
+    mustfill = true;
+  }
+  if (y0<0) {
+    Y += y0;
+    yout = -y0;
+    y0 = 0;
+    mustfill = true;
+  }
+  if (x0 + X > src->width()) {
+    X = src->width() - x0;
+    mustfill = true;
+  }
+  if (y0 + Y > src->height()) {
+    Y = src->height() - y0;
+    mustfill = true;
+  }
+  if (mustfill)
+    dst.fill(QColor(128,128,128));
+  if (X<=0 || Y<=0)
+    return dst;
+  
+  for (int y=0; y<Y; y++) {
+    uint8_t const *rp = src->line(y+y0) + x0;
+    uint32_t *dstp = reinterpret_cast<uint32_t*>(dst.scanLine(y + yout)) + xout;
+    uint8_t const *gp = rp + X;
+    uint8_t const *bp = gp + X;
+    for (int x=0; x<X; x++) {
+      uint32_t r = *rp++;
+      uint32_t g = *gp++;
+      uint32_t b = *bp++;
+      uint32_t rgb = 0xff000000 + r + (g<<8) + (b<<16);
+      *dstp++ = rgb;
+    }
   }
   return dst;
 }
