@@ -14,3 +14,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # Input
 HEADERS += ImageVault.h Image.h Viewer.h Navigator.h
 SOURCES += ImageVault.cpp Image.cpp gpix.cpp Viewer.cpp Navigator.cpp
+HEADERS += Posthoc.h PosthocPanel.h
+SOURCES += Posthoc.cpp PosthocPanel.cpp
+FORMS += PosthocPanel.ui

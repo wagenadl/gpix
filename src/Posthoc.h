@@ -6,7 +6,7 @@
 
 #include <QImage>
 
-public Posthoc {
+class Posthoc {
 public:
   uint8_t blacklevel;
   uint8_t whitelevel;
@@ -16,8 +16,7 @@ public:
 public:
   Posthoc(): blacklevel(0), whitelevel(255), log2gamma(0),
     blurfrac(0), K(1) { }
-  }
-  QImage apply(QImage) const;
+  void apply(QImage &) const;
 };
 
 #endif

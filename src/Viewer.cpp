@@ -9,6 +9,7 @@
 #include "Navigator.h"
 #include <QDebug>
 #include <QFileInfo>
+#include "PosthocPanel.h"
 
 Viewer::Viewer(QWidget *parent): QFrame(parent) {
   vault = 0;
@@ -18,6 +19,11 @@ Viewer::Viewer(QWidget *parent): QFrame(parent) {
   // setAutoFillBackground(true);
   setTitle();
   pixaccum = 0;
+  post = 0;
+  posten = 0;
+}
+
+Viewer::~Viewer() {
 }
 
 static constexpr int MUSTRECALC = 10000;
@@ -72,6 +78,8 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
   case Qt::Key_Slash:
     enableNavigator(!naven);
     break;
+  case Qt::Key_8: case Qt::Key_Asterisk:
+    enablePosthoc(!posten);
   default:
     break;
   }
@@ -166,11 +174,15 @@ void Viewer::paintEvent(QPaintEvent *e) {
     int w = width() >> (-poweroftwo);
     int h = height() >> (-poweroftwo);
     QImage img = vault->roi(0, QRect(QPoint(x0,y0), QSize(w,h)));
+    if (post)
+      post->posthoc().apply(img);
     p.scale(1<<(-poweroftwo), 1<<(-poweroftwo));
     p.drawImage(QPoint(), img);
   } else {
-    p.drawImage(QPoint(),
-		vault->roi(poweroftwo, QRect(topleft, size())));
+    QImage img = vault->roi(poweroftwo, QRect(topleft, size()));
+    if (post)
+      post->posthoc().apply(img);
+    p.drawImage(QPoint(), img);
   }
 }
 
@@ -207,5 +219,19 @@ void Viewer::enableNavigator(bool x) {
     nav->show();
   } else {
     nav->hide();
+  }
+}
+
+void Viewer::enablePosthoc(bool x) {
+  posten = x;
+  if (x) {
+    if (!post) {
+      post = new PosthocPanel(this);
+      connect(post, &PosthocPanel::settingsChanged,
+              [this]() { update(); });
+    }
+    post->show();
+  } else {
+    post->hide();
   }
 }

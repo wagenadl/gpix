@@ -57,7 +57,8 @@ quickly than other programs.
 When gpix starts, it zooms out to show the entire image in its
 window. Press “+” to zoom in and “-” to zoom out. Press “/” to enable
 a navigator inset that indicates what part of the full image is being
-shown.
+shown. Press “*” to open a panel with adjustment sliders for black level,
+white level, gamma adjustment, and low-pass filtering.
 
 Drag the mouse to slowly move around the image, use the scroll wheel
 to move more rapidly around the image. Control + scroll zooms in and

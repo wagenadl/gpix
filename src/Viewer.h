@@ -10,7 +10,7 @@
 class Viewer: public QFrame {
 public:
   Viewer(QWidget *parent=0);
-  virtual ~Viewer() {}
+  virtual ~Viewer();
   void setFilename(QString);
   void setSource(ImageVault const *vault);
   void keyPressEvent(QKeyEvent *) override;
@@ -21,6 +21,7 @@ public:
   void paintEvent(QPaintEvent *) override;
   void setTitle();
   void enableNavigator(bool x=true);
+  void enablePosthoc(bool x=true);
   void newPosition();
   void zoomIn();
   void zoomOut();
@@ -35,6 +36,8 @@ private:
   class Navigator *nav;
   bool naven;
   int pixaccum;
+  class PosthocPanel *post;
+  bool posten;
 };
 
 #endif
